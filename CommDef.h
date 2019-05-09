@@ -1,3 +1,7 @@
+#ifndef __COMMDEF_H__
+#define __COMMDEF_H__
+
+
 #define MODE_DEVICE 0x02
 #define MODE_HOST 0x06
 #define CURSORBEGIN 0x00000000
@@ -229,3 +233,5 @@ enum fileProcessENUM { // for file read/write state machine
 			uint16_t startCl;//2
 			uint32_t size;//4
 		};
+
+#endif

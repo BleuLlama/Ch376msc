@@ -24,6 +24,30 @@
 #include <SPI.h>
 
 
+// Usually, you'd either want one or the other, and including both is generally
+// a waste. Especially for a thing like the CH376 where the major advantage is 
+// super-low overhead since there's no need for the FAT libraries, etc.
+//
+// barebones sketch, on Arduino Leonardo
+// Both DEFINEd, using SPI
+//		Sketch uses 6634 bytes (23%) of program storage space. Maximum is 28672 bytes.
+// Both DEFINEd, using hardware Serial
+//		Sketch uses 7388 bytes (25%) of program storage space. Maximum is 28672 bytes.
+//
+// SPI only
+//		Sketch uses 5610 bytes (19%) of program storage space. Maximum is 28672 bytes.
+//
+// Serial only
+//  	Sketch uses 6298 bytes (21%) of program storage space. Maximum is 28672 bytes.
+// 
+//  it's not much, but 1kbyte is a nice savings when you're pressed for space...
+
+// allow all of the UART-to-CH376 code
+#undef kALLOW_SERIAL
+
+// allow all of the SPI-to-CH376 code
+#define kALLOW_SPI
+
 #define TIMEOUT 2000 // waiting for data from CH
 #define SPICLKRATE 125000 //Clock rate 125kHz
 						// max 8000000 (8MHz)on UNO, Mega (16 000 000 / 2 = 8 000 000)
@@ -31,10 +55,14 @@
 class Ch376msc {
 public:
 	/////////////Constructors////////////////////////
+#ifdef kALLOW_SERIAL
 	Ch376msc(HardwareSerial &usb, uint32_t speed);//HW serial
 	Ch376msc(Stream &sUsb);// SW serial
+#endif
+#ifdef kALLOW_SPI
 	Ch376msc(uint8_t spiSelect, uint8_t busy);//SPI with MISO as Interrupt pin
 	Ch376msc(uint8_t spiSelect, uint8_t busy, uint8_t intPin);
+#endif
 	virtual ~Ch376msc();//destructor
 	////////////////////////////////////////////////
 	void init();
@@ -82,11 +110,14 @@ private:
 	//uint8_t read();
 	void write(uint8_t data);
 	void print(const char str[]);
+
+#ifdef kALLOW_SPI
 	void spiReady();
 	void spiBeginTransfer();
 	void spiEndTransfer();
 	void waitSpiInterrupt();
 	uint8_t spiReadData();
+#endif
 
 	uint8_t getInterrupt();
 	uint8_t fileEnumGo();
@@ -95,14 +126,18 @@ private:
 	uint8_t byteWrGo();
 	uint8_t reqByteRead(uint8_t a);
 	uint8_t reqByteWrite(uint8_t a);
+#ifdef kALLOW_SERIAL
 	uint8_t readSerDataUSB();
+#endif
 	uint8_t writeDataFromBuff(char* buffer);
 	uint8_t readDataToBuff(char* buffer);
 	uint8_t dirInfoRead();
 	uint8_t setMode(uint8_t mode);
 
 	void rdUsbData();
+#ifdef kALLOW_SERIAL
 	void setSpeed();
+#endif
 	void sendCommand(uint8_t b_parancs);
 	void sendFilename();
 	void writeFatData();

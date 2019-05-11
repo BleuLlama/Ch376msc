@@ -198,10 +198,6 @@
 #define ANSW_ERR_FDT_OVER 0xb2		//Directory full
 #define ANSW_ERR_FILE_CLOSE 0xb4	//Attempted operation on closed file
 
-enum commInterface{
-	UART,
-	SPII
-};
 
 enum fileProcessENUM { // for file read/write state machine
 	REQUEST,

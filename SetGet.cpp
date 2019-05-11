@@ -31,6 +31,7 @@ uint32_t Ch376msc::getFileSize(){
 	return _fileData.size;
 }
 
+#ifdef kALLOW_UTILITIES
 char* Ch376msc::getFileSizeStr(){ // make formatted file size string from unsigned long
 	// final string is declared as static, return value
 	static char _fsizeString[10];// e.g 1023 byte\0 , 9 char long + NULL terminating char
@@ -53,7 +54,9 @@ char* Ch376msc::getFileSizeStr(){ // make formatted file size string from unsign
 	}
 	return _fsizeString; //return the final string
 }
+#endif
 
+#ifdef kALLOW_TIMEDATE
 void Ch376msc::setYear(uint16_t year){ //Year(0 = 1980, 119 = 2099 supported under DOS/Windows, theoretically up to 127 = 2107)
 	if(year > 2099) year = 2099;
 	if(year < 1980) year = 1980;
@@ -201,4 +204,5 @@ void Ch376msc::constructTime(uint16_t value, uint8_t hms){
 	_fileData.modTime = hour + minute + second;
 }
 
+#endif
 

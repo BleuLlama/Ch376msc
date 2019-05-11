@@ -42,11 +42,24 @@
 // 
 //  it's not much, but 1kbyte is a nice savings when you're pressed for space...
 
-// allow all of the UART-to-CH376 code
-#undef kALLOW_SERIAL
+// use only the SERIAL interface
+#undef kUSE_SERIAL
 
-// allow all of the SPI-to-CH376 code
-#define kALLOW_SPI
+// use only the SPI interface
+#define kUSE_SPI
+
+// but only one!
+#ifdef kUSE_SERIAL
+#ifdef kUSE_SPI
+	*** ERROR.  Cannot use both!
+#endif
+#endif
+
+// allow all of the time/date functionality
+#define kALLOW_TIMEDATE
+
+// allow misc utilities (timedate string etc.)
+#define kALLOW_UTILITIES
 
 #define TIMEOUT 2000 // waiting for data from CH
 #define SPICLKRATE 125000 //Clock rate 125kHz
@@ -55,11 +68,11 @@
 class Ch376msc {
 public:
 	/////////////Constructors////////////////////////
-#ifdef kALLOW_SERIAL
+#ifdef kUSE_SERIAL
 	Ch376msc(HardwareSerial &usb, uint32_t speed);//HW serial
 	Ch376msc(Stream &sUsb);// SW serial
 #endif
-#ifdef kALLOW_SPI
+#ifdef kUSE_SPI
 	Ch376msc(uint8_t spiSelect, uint8_t busy);//SPI with MISO as Interrupt pin
 	Ch376msc(uint8_t spiSelect, uint8_t busy, uint8_t intPin);
 #endif
@@ -85,25 +98,33 @@ public:
 
 	//uint32_t getComSpeed();
 	uint32_t getFileSize();
+
+#ifdef kALLOW_TIMEDATE
 	uint16_t getYear();
 	uint16_t getMonth();
 	uint16_t getDay();
 	uint16_t getHour();
 	uint16_t getMinute();
 	uint16_t getSecond();
+#endif
 	uint8_t getStatus();
 	char* getFileName();
+#ifdef kALLOW_UTILITIES
 	char* getFileSizeStr();
+#endif
 	bool getDeviceStatus(); // usb device mounted, unmounted
 	bool getCHpresence();
 
 	void setFileName(const char* filename);
+
+#ifdef kALLOW_TIMEDATE
 	void setYear(uint16_t year);
 	void setMonth(uint16_t month);
 	void setDay(uint16_t day);
 	void setHour(uint16_t hour);
 	void setMinute(uint16_t minute);
 	void setSecond(uint16_t second);
+#endif 
 
 private:
 	//
@@ -111,7 +132,7 @@ private:
 	void write(uint8_t data);
 	void print(const char str[]);
 
-#ifdef kALLOW_SPI
+#ifdef kUSE_SPI
 	void spiReady();
 	void spiBeginTransfer();
 	void spiEndTransfer();
@@ -126,7 +147,7 @@ private:
 	uint8_t byteWrGo();
 	uint8_t reqByteRead(uint8_t a);
 	uint8_t reqByteWrite(uint8_t a);
-#ifdef kALLOW_SERIAL
+#ifdef kUSE_SERIAL
 	uint8_t readSerDataUSB();
 #endif
 	uint8_t writeDataFromBuff(char* buffer);
@@ -135,14 +156,17 @@ private:
 	uint8_t setMode(uint8_t mode);
 
 	void rdUsbData();
-#ifdef kALLOW_SERIAL
+#ifdef kUSE_SERIAL
 	void setSpeed();
 #endif
 	void sendCommand(uint8_t b_parancs);
 	void sendFilename();
 	void writeFatData();
+#ifdef kALLOW_TIMEDATE
 	void constructDate(uint16_t value, uint8_t ymd);
 	void constructTime(uint16_t value, uint8_t hms);
+#endif
+
 //#define TEST
 #ifdef TEST
 
@@ -166,7 +190,6 @@ private:
 	HardwareSerial* _comPortHW; // Serial interface
 	Stream* _comPort;
 
-	commInterface _interface;
 	fileProcessENUM fileProcesSTM = REQUEST;
 
 	fatFileInfo _fileData;

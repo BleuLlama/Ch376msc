@@ -8,7 +8,7 @@
 
 #include "Ch376msc.h"
 
-#ifdef kALLOW_SERIAL
+#ifdef kUSE_SERIAL
 uint8_t Ch376msc::readSerDataUSB(){
 	uint32_t oldMillis = millis();
 		while (!_comPort->available()){ // wait until data is arrive
@@ -21,20 +21,16 @@ uint8_t Ch376msc::readSerDataUSB(){
 #endif
 
 void Ch376msc::write(uint8_t data){
-#ifdef kALLOW_SERIAL
-	if(_interface == UART){
+#ifdef kUSE_SERIAL
 		_comPort->write(data);
-	} 
 #endif
-#ifdef kALLOW_SPI
-	if( _interface == SPII ) { // SPI
+#ifdef kUSE_SPI
 		delayMicroseconds(3);//datasheet TSC min 1.5uSec
 		SPI.transfer(data);
-	}//end SPI
 #endif
 }
 
-#ifdef kALLOW_SPI
+#ifdef kUSE_SPI
 uint8_t Ch376msc::spiReadData(){
 	delayMicroseconds(3);//datasheet TSC min 1.5uSec
 	return SPI.transfer(0x00);
@@ -44,21 +40,17 @@ uint8_t Ch376msc::spiReadData(){
 void Ch376msc::print(const char str[]){
 	uint8_t stringCounter = 0;
 #ifdef kALLOW_UART
-	if(_interface == UART){
 		_comPort->print(str);
-	}
 #endif
-#ifdef kALLOW_SPI
-	if( _interface == SPII ) { // SPI
+#ifdef kUSE_SPI
 		while(str[stringCounter]){ ///while not NULL
 			write(str[stringCounter]);
 			stringCounter++;
 		}
-	}
 #endif
 }
 
-#ifdef kALLOW_SPI
+#ifdef kUSE_SPI
 void Ch376msc::spiReady(){
 	uint32_t msTimeout;
 	delayMicroseconds(3);

@@ -1,8 +1,9 @@
 /*
- * SetGet.cpp
+ * SerGet.cpp
  *
  *  Created on: Mar 27, 2019
  *      Author: György Kovács
+ *		Contributor: Scott Lawrence - yorgle@gmail.com
  */
 
 #include "Ch376msc.h"

@@ -3,6 +3,16 @@
  *
  *  Created on: Feb 25, 2019
  *      Author: György Kovács
+ *		Contributor: Scott Lawrence - yorgle@gmail.com
+ *
+ *
+ *  v1.2.1.S1	May 11, 2019	SL
+ *		Changes to minimize footprint: 
+ *			added #ifdefs to enable/disable functionality
+ *			mainly, to not use SPI and UART at the same time
+ *		various text formatting changes
+ *
+ ******************************************************
  *  v1.2 Apr 24, 2019
  *  	-fixing timing issue on higher SPI clock
  *  	 datasheet 7.3 Time Sequence table (TSC)
@@ -98,6 +108,12 @@ public:
 
 	//uint32_t getComSpeed();
 	uint32_t getFileSize();
+	uint8_t getStatus();
+	char* getFileName();
+
+	bool getDeviceStatus(); // usb device mounted, unmounted
+	bool getCHpresence();
+	void setFileName(const char* filename);
 
 #ifdef kALLOW_TIMEDATE
 	uint16_t getYear();
@@ -106,31 +122,39 @@ public:
 	uint16_t getHour();
 	uint16_t getMinute();
 	uint16_t getSecond();
-#endif
-	uint8_t getStatus();
-	char* getFileName();
-#ifdef kALLOW_UTILITIES
-	char* getFileSizeStr();
-#endif
-	bool getDeviceStatus(); // usb device mounted, unmounted
-	bool getCHpresence();
-
-	void setFileName(const char* filename);
-
-#ifdef kALLOW_TIMEDATE
 	void setYear(uint16_t year);
 	void setMonth(uint16_t month);
 	void setDay(uint16_t day);
 	void setHour(uint16_t hour);
 	void setMinute(uint16_t minute);
 	void setSecond(uint16_t second);
-#endif 
+#endif
+
+#ifdef kALLOW_UTILITIES
+	char* getFileSizeStr();
+#endif
 
 private:
-	//
 	//uint8_t read();
 	void write(uint8_t data);
 	void print(const char str[]);
+
+	uint8_t getInterrupt();
+	uint8_t fileEnumGo();
+	uint8_t byteRdGo();
+	uint8_t fileCreate();
+	uint8_t byteWrGo();
+	uint8_t reqByteRead(uint8_t a);
+	uint8_t reqByteWrite(uint8_t a);
+	uint8_t writeDataFromBuff(char* buffer);
+	uint8_t readDataToBuff(char* buffer);
+	uint8_t dirInfoRead();
+	uint8_t setMode(uint8_t mode);
+
+	void rdUsbData();
+	void sendCommand(uint8_t b_parancs);
+	void sendFilename();
+	void writeFatData();
 
 #ifdef kUSE_SPI
 	void spiReady();
@@ -140,28 +164,11 @@ private:
 	uint8_t spiReadData();
 #endif
 
-	uint8_t getInterrupt();
-	uint8_t fileEnumGo();
-	uint8_t byteRdGo();
-	uint8_t fileCreate();
-	uint8_t byteWrGo();
-	uint8_t reqByteRead(uint8_t a);
-	uint8_t reqByteWrite(uint8_t a);
-#ifdef kUSE_SERIAL
-	uint8_t readSerDataUSB();
-#endif
-	uint8_t writeDataFromBuff(char* buffer);
-	uint8_t readDataToBuff(char* buffer);
-	uint8_t dirInfoRead();
-	uint8_t setMode(uint8_t mode);
-
-	void rdUsbData();
 #ifdef kUSE_SERIAL
 	void setSpeed();
+	uint8_t readSerDataUSB();
 #endif
-	void sendCommand(uint8_t b_parancs);
-	void sendFilename();
-	void writeFatData();
+
 #ifdef kALLOW_TIMEDATE
 	void constructDate(uint16_t value, uint8_t ymd);
 	void constructTime(uint16_t value, uint8_t hms);
@@ -193,8 +200,6 @@ private:
 	fileProcessENUM fileProcesSTM = REQUEST;
 
 	fatFileInfo _fileData;
-
-
 };//end class
 
 #endif /* Ch376msc_H_ */

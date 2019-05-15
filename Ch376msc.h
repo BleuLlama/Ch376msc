@@ -6,7 +6,7 @@
  *		Contributor: Scott Lawrence - yorgle@gmail.com
  *
  *
- *  v1.2.1.S1	May 11, 2019	SL
+ *  v1.2.1.001	May 11, 2019	SL
  *		Changes to minimize footprint: 
  *			added #ifdefs to enable/disable functionality
  *			mainly, to not use SPI and UART at the same time
@@ -95,6 +95,8 @@ public:
 	uint8_t openFile();
 	uint8_t closeFile();
 	uint8_t moveCursor(uint32_t position);
+	uint8_t seekRewind()	{ moveCursor( CURSORBEGIN ); }
+	uint8_t seekEnd() 		{ moveCursor( CURSOREND); }
 	uint8_t deleteFile();
 	uint8_t pingDevice();
 	uint8_t listDir();

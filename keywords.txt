@@ -16,6 +16,8 @@ dirInfoSave     KEYWORD2
 openFile		KEYWORD2
 closeFile		KEYWORD2
 moveCursor		KEYWORD2
+seekRewind		KEYWORD2
+seekEnd			KEYWORD2
 deleteFile		KEYWORD2
 pingDevice		KEYWORD2
 listDir			KEYWORD2

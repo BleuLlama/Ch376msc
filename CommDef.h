@@ -11,8 +11,10 @@
 
 #define MODE_DEVICE 	(0x02)
 #define MODE_HOST 		(0x06)
+
 #define CURSORBEGIN 	(0x00000000)
 #define CURSOREND 		(0xFFFFFFFF)
+
 
 ////////////Commands/////////
 #define CMD_GET_IC_VER 		(0x01)

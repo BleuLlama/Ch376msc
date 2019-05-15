@@ -3,7 +3,7 @@
  *
  *  Created on: Feb 25, 2019
  *      Author: György Kovács
- *
+ *		Contributor: Scott Lawrence - yorgle@gmail.com
  */
 
 #include "Ch376msc.h"
@@ -58,12 +58,14 @@ void Ch376msc::init(){
 		digitalWrite(_spiChipSelect, HIGH);
 		pinMode(_spiBusy, INPUT);
 		if(_intPin != MISO) pinMode(_intPin, INPUT_PULLUP);
+
 		SPI.begin();
 		spiBeginTransfer();
 		sendCommand(CMD_RESET_ALL);
 		spiEndTransfer();
 		delay(40);
 		spiReady();//wait for device
+
 		if(_intPin == MISO){ // if we use MISO as interrupt pin, then tell it for the device ;)
 			spiBeginTransfer();
 			sendCommand(CMD_SET_SD0_INT);
@@ -409,8 +411,8 @@ uint8_t Ch376msc::listDir(){
 	while(!doneFiles){
 		switch (fileProcesSTM) {
 			case REQUEST:
-				setFileName("*");
-				sendFilename();
+				setFileName( "*" );
+				// already done sendFilename();
 				_answer = openFile();
 				_fileWrite = false; // read mode, required for close procedure
 				fileProcesSTM = READWRITE;
@@ -685,6 +687,7 @@ uint8_t Ch376msc::reqByteWrite(uint8_t a){
 }
 
 /////////////////////////////////////////////////////////////////
+
 uint8_t Ch376msc::moveCursor(uint32_t position){
 	uint8_t _tmpReturn = 0;
 	fSizeContainer cPosition; //unsigned long union
@@ -708,15 +711,16 @@ uint8_t Ch376msc::moveCursor(uint32_t position){
 	return _tmpReturn;
 }
 
+
 /////////////////////////////////////////////////////////////////
 void Ch376msc::sendFilename(){
 #ifdef kUSE_SPI
 	spiBeginTransfer();
 #endif
 	sendCommand(CMD_SET_FILE_NAME);
-	write(0x2f); // "/" root directory
+	//SDL 2019 write(0x2f); // "/" root directory
 	print(_filename); // filename
-	write(0x5C);	// ez a "\" jel
+	//SDL 2019 write(0x5C);	// ez a "\" jel
 	write((uint8_t)0x00);	// ez a lezaro 0 jel
 
 #ifdef kUSE_SPI
